@@ -21,7 +21,8 @@ BEGIN {
 }
 
 
-use Encode;
+use Encode qw/decode encode/;
+use Digest::SHA qw/sha512_hex/;
 
 
 my $server_script = "http://".$ENV{'SERVER_NAME'}.$ENV{'SCRIPT_NAME'};
@@ -41,7 +42,9 @@ my %images_gif = (
 );
 
 
-my %cookies = ();
+my %cookies = (
+  "cu" => "",#current_user-sha512_hex
+);
 foreach (split(/;/,$ENV{'HTTP_COOKIE'})) {
   my ($k, $v) = split(/=/, $_);
   $k =~ s/ //;
@@ -58,9 +61,21 @@ my %form = (
 );
 
 
-if ($cookies{'cu'} && $login_info{$cookies{'cu'}}) {
+my $login_user = "";
+if ($cookies{'cu'}) {
+  foreach (keys(%login_info)) {
+    my $hex = Digest::SHA::sha512_hex($_);
+    if ($hex eq $cookies{'cu'}) {
+      $login_user = $_;
+      last;
+    }
+  }
+}
+
+
+if ($login_user && $login_info{$login_user}) {
   my $root_directory = $ENV{'DOCUMENT_ROOT'};
-  $root_directory =~ s/(\/.+)?\/.+$/$1\/$login_info{$cookies{'cu'}}{'directory'}\//;
+  $root_directory =~ s/(\/.+)?\/.+$/$1\/$login_info{$login_user}{'directory'}\//;
   die "E1001：$root_directory"
     if (!(-d $root_directory));
 
@@ -182,11 +197,12 @@ if ($cookies{'cu'} && $login_info{$cookies{'cu'}}) {
   if ($current_user && $current_pass) {
     foreach (keys(%login_info)) {
       if ($current_user eq $_ && $current_pass eq $login_info{$_}{'password'}) {
-        print "Set-Cookie: cu=$current_user; path=/;\n";
+        my $hex = Digest::SHA::sha512_hex($current_user);
+        print "Set-Cookie: cu=$hex; path=/;\n";
         print "content-type: text/html; charset=UTF-8\n\n";
         print "<html><head>";
         print "<meta http-equiv=\"content-type\" content=\"text/html; charset=UTF-8\">";
-        print "<meta http-equiv=\"refresh\" content=\"3; URL=$server_script\">";
+        print "<meta http-equiv=\"refresh\" content=\"0; URL=$server_script\">";
         print "<style type=\"text/css\">";
         print "<!--\n";
         print "*{font-size:10pt\;color:#333\;}";
