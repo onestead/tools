@@ -1,0 +1,3 @@
+#Makefile
+out.exe: *.cs
+    csc.exe -out:out.exe *.cs
