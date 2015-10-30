@@ -28,7 +28,7 @@ use Digest::SHA qw/sha512_hex/;
 my $server_script = "http://".$ENV{'SERVER_NAME'}.$ENV{'SCRIPT_NAME'};
 
 
-my $hkey = "b8e7ae12510bdfb1812e463a7f086122cf37e4f7";
+my $hkey = "b8e7ae12510bdfb1812e463a7f086122cf37e4f7fb1812e463a7f0";
 
 
 my %login_info = (
