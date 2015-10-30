@@ -205,55 +205,56 @@ if ($login_user && $login_info{$login_user}) {
         my @list = ('A'..'Z', 'a'..'z', 0..9);
         my $salt = time();
         $salt.= $list[int(rand($#list))] for (1..10);
-        $server_script.= "?ut=$salt";
-
+        $salt = Digest::SHA::sha1_hex($salt);
 
         my $hex = Digest::SHA::hmac_sha512_hex($salt.$current_user, $hkey);
         print "Set-Cookie: cu=$hex; path=/;\n";
         print "content-type: text/html; charset=UTF-8\n\n";
         print "<html><head>";
         print "<meta http-equiv=\"content-type\" content=\"text/html; charset=UTF-8\">";
-        print "<meta http-equiv=\"refresh\" content=\"0; URL=$server_script\">";
+        print "<meta http-equiv=\"refresh\" content=\"0; URL=$server_script?ut=$salt\">";
         print "<style type=\"text/css\">";
         print "<!--\n";
         print "*{font-size:10pt\;color:#333\;}";
         print "//-->";
         print "</style>";
         print "</head><body>";
-        print "<div><a href=\"$server_script\">$server_script</a></div>";
+        print "<div><a href=\"$server_script?ut=$salt\">$server_script</a></div>";
         print "<div>&nbsp;</div>";
         print "<div>＊自動的に切り替わります。（画面が切り替わらない場合はクリックして移動してください。）</div>";
         print "</body></html>";
         exit;
       }
     }
+    print "Location: $server_script\n\n";
+  } else {
+    print "content-type: text/html; charset=UTF-8\n\n";
+    print "<html><head>";
+    print "<meta http-equiv=\"content-type\" content=\"text/html; charset=UTF-8\">";
+    print "<style type=\"text/css\">";
+    print "<!--\n";
+    print "*{font-size:10pt\;color:#333\;}";
+    print "fieldset{padding:10px\;}";
+    print "legend{font-weight:bold\;}";
+    print "hr{height:1px\;}";
+    print "img{border:0px\;margin:0px\;}";
+    print "span{display:inline-block;width:80px;height:24px;}";
+    print "//-->";
+    print "</style>";
+    print "</head><body>";
+    print "<fieldset><legend>ログイン</legend>";
+    print "<form method=\"POST\">";
+    print "<ul>";
+    print "<li><span>ユーザーID</span><input name=\"cu\" value=\"".$form{'cu'}."\" type=\"text\" placeholder=\"...半角英数\" pattern=\"^[0-9A-Za-z]+\$\" required autofocus></li>";
+    print "<li><span>パスワード</span><input name=\"cp\" value=\"".$form{'cp'}."\" type=\"password\" placeholder=\"...\" required></li>";
+    print "</ul>";
+    print "<hr>";
+    print "<div><input type=\"submit\" value=\"ログイン\"></div>";
+    print "</form>";
+    print "</fieldset>";
+    print "<hr>＊Cookieを無効にしているとログインできませんのでご注意ください！";
+    print "</body></html>";
   }
-  print "content-type: text/html; charset=UTF-8\n\n";
-  print "<html><head>";
-  print "<meta http-equiv=\"content-type\" content=\"text/html; charset=UTF-8\">";
-  print "<style type=\"text/css\">";
-  print "<!--\n";
-  print "*{font-size:10pt\;color:#333\;}";
-  print "fieldset{padding:10px\;}";
-  print "legend{font-weight:bold\;}";
-  print "hr{height:1px\;}";
-  print "img{border:0px\;margin:0px\;}";
-  print "span{display:inline-block;width:80px;height:24px;}";
-  print "//-->";
-  print "</style>";
-  print "</head><body>";
-  print "<fieldset><legend>ログイン</legend>";
-  print "<form method=\"POST\">";
-  print "<ul>";
-  print "<li><span>ユーザーID</span><input name=\"cu\" value=\"".$form{'cu'}."\" type=\"text\" placeholder=\"...半角英数\" pattern=\"^[0-9A-Za-z]+\$\" required autofocus></li>";
-  print "<li><span>パスワード</span><input name=\"cp\" value=\"".$form{'cp'}."\" type=\"password\" placeholder=\"...\" required></li>";
-  print "</ul>";
-  print "<hr>";
-  print "<div><input type=\"submit\" value=\"ログイン\"></div>";
-  print "</form>";
-  print "</fieldset>";
-  print "<hr>＊Cookieを無効にしているとログインできませんのでご注意ください！";
-  print "</body></html>";
 }
 
 
