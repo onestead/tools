@@ -28,6 +28,9 @@ use Digest::SHA qw/sha512_hex/;
 my $server_script = "http://".$ENV{'SERVER_NAME'}.$ENV{'SCRIPT_NAME'};
 
 
+my $hkey = "b8e7ae12510bdfb1812e463a7f086122cf37e4f7";
+
+
 my %login_info = (
   "demo" => {"password" => "test", "directory" => "download"},
 );
@@ -58,16 +61,43 @@ my %form = (
   "cf" => "",#current_file
   "cu" => "",#current_user
   "cp" => "",#current_pass
+  "ut" => "",#user_token
 );
 
 
+if ($ENV{'REQUEST_METHOD'} eq "POST") {
+  my $query = "";
+  read(STDIN, $query, $ENV{CONTENT_LENGTH});
+  $query =~ tr/+/ /;
+  $query =~ s/%([0-9A-Fa-f][0-9A-Fa-f])/pack('H2', $1)/eg;
+  foreach (split(/&/, $query)) {
+    my ($k, $v) = split(/=/,$_);
+    $v =~ tr/+/ /;
+    $v =~ s/%([a-fA-F0-9][a-fA-F0-9])/pack("C", hex($1))/eg;
+    $form{$k} = $v;
+  }
+} elsif ($ENV{'REQUEST_METHOD'} eq "GET") {
+  my $query = $ENV{'QUERY_STRING'};
+  $query =~ tr/+/ /;
+  $query =~ s/%([0-9A-Fa-f][0-9A-Fa-f])/pack('H2', $1)/eg;
+  foreach (split(/&/, $query)) {
+    my ($k, $v) = split(/=/,$_);
+    $v =~ tr/+/ /;
+    $v =~ s/%([a-fA-F0-9][a-fA-F0-9])/pack("C", hex($1))/eg;
+    $form{$k} = $v;
+  }
+}
+
 my $login_user = "";
-if ($cookies{'cu'}) {
-  foreach (keys(%login_info)) {
-    my $hex = Digest::SHA::sha512_hex($_);
-    if ($hex eq $cookies{'cu'}) {
-      $login_user = $_;
-      last;
+if ($form{'ut'}) {
+  $server_script.= "?ut=$form{'ut'}";
+  if ($cookies{'cu'}) {
+    foreach (keys(%login_info)) {
+      my $hex = Digest::SHA::hmac_sha512_hex($form{'ut'}.$_, $hkey);
+      if ($hex eq $cookies{'cu'}) {
+        $login_user = $_;
+        last;
+      }
     }
   }
 }
@@ -80,24 +110,13 @@ if ($login_user && $login_info{$login_user}) {
     if (!(-d $root_directory));
 
 
-  if ($ENV{'REQUEST_METHOD'} eq "GET") {
-    my $query = $ENV{'QUERY_STRING'};
-    $query =~ tr/+/ /;
-    $query =~ s/%([0-9A-Fa-f][0-9A-Fa-f])/pack('H2', $1)/eg;
-    foreach (split(/&/, $query)) {
-      my ($k, $v) = split(/=/,$_);
-      $v =~ tr/+/ /;
-      $v =~ s/%([a-fA-F0-9][a-fA-F0-9])/pack("C", hex($1))/eg;
-      $form{$k} = $v;
-    }
-  }
   die "E1002：$form{'cd'}"
     if ($form{'cd'} =~ m/^\./ || $form{'cd'} =~ m/\/$/);
 
 
   if ($form{'cm'} ne "cd") {
     my $directory = "$root_directory$form{'cd'}";
-    opendir(DIR, $directory) || die "E1003：$form{'cd'}";
+    opendir(DIR, $directory) || die "E2001：$form{'cd'}";
     my @reading_list = sort grep(!/^\./, readdir(DIR));
     closedir(DIR);
     print "content-type: text/html; charset=UTF-8\n\n";
@@ -136,12 +155,12 @@ if ($login_user && $login_info{$login_user}) {
         if ($files) { 
           print "・ ";
           print "<img src=\"$images_gif{'file'}\" height=\"19\" width=\"19\">";
-          print "<a target=\"_blank\" href=\"$server_script?cm=cd&cf=$para_directory$para_file\">$file_name</a>";
+          print "<a target=\"_blank\" href=\"$server_script&cm=cd&cf=$para_directory$para_file\">$file_name</a>";
           print "&nbsp;<img src=\"$images_gif{'new'}\" height=\"12\" width=\"22\"><br>";
         } else {
           print "・ ";
           print "<img src=\"$images_gif{'file'}\" height=\"19\" width=\"19\">";
-          print "<a target=\"_blank\" href=\"$server_script?cm=cd&cf=$para_directory$para_file\">$file_name</a>";
+          print "<a target=\"_blank\" href=\"$server_script&cm=cd&cf=$para_directory$para_file\">$file_name</a>";
           print "<br>";
         }
       } else {
@@ -149,12 +168,12 @@ if ($login_user && $login_info{$login_user}) {
         if ($files) {
           print "・ ";
           print "<img src=\"$images_gif{'folder'}\" height=\"19\" width=\"19\">";
-          print "<a href=\"$server_script?cd=$para_directory$para_file\">$file_name</a>";
+          print "<a href=\"$server_script&cd=$para_directory$para_file\">$file_name</a>";
           print "&nbsp;<img src=\"$images_gif{'new'}\" height=\"12\" width=\"22\"><br>";
         } else {
           print "・ ";
           print "<img src=\"$images_gif{'folder'}\" height=\"19\" width=\"19\">";
-          print "<a href=\"$server_script?cd=$para_directory$para_file\">$file_name</a>";
+          print "<a href=\"$server_script&cd=$para_directory$para_file\">$file_name</a>";
           print "<br>";
         }
       }
@@ -173,31 +192,23 @@ if ($login_user && $login_info{$login_user}) {
       print qq|Content-type: application/octet-stream; name="$save_file"\n|;
       print qq|Content-Disposition: attachment; filename="$save_file"\n\n|;
     }
-    open IN,"$path_file" || die "E2001：$form{'cf'}";
+    open IN,"$path_file" || die "E3001：$form{'cf'}";
     print <IN>;
     close IN;
   }
 } else {
-  if ($ENV{'REQUEST_METHOD'} eq "POST") {
-    my $query = "";
-    read(STDIN, $query, $ENV{CONTENT_LENGTH});
-    $query =~ tr/+/ /;
-    $query =~ s/%([0-9A-Fa-f][0-9A-Fa-f])/pack('H2', $1)/eg;
-    foreach (split(/&/, $query)) {
-      my ($k, $v) = split(/=/,$_);
-      $v =~ tr/+/ /;
-      $v =~ s/%([a-fA-F0-9][a-fA-F0-9])/pack("C", hex($1))/eg;
-      $form{$k} = $v;
-    }
-  }
-
-
   my $current_user = $form{'cu'};
   my $current_pass = $form{'cp'};
   if ($current_user && $current_pass) {
     foreach (keys(%login_info)) {
       if ($current_user eq $_ && $current_pass eq $login_info{$_}{'password'}) {
-        my $hex = Digest::SHA::sha512_hex($current_user);
+        my @list = ('A'..'Z', 'a'..'z', 0..9);
+        my $salt = time();
+        $salt.= $list[int(rand($#list))] for (1..10);
+        $server_script.= "?ut=$salt";
+
+
+        my $hex = Digest::SHA::hmac_sha512_hex($salt.$current_user, $hkey);
         print "Set-Cookie: cu=$hex; path=/;\n";
         print "content-type: text/html; charset=UTF-8\n\n";
         print "<html><head>";
