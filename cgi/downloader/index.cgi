@@ -13,7 +13,7 @@ BEGIN {
     print "*{font-size:10pt\;color:#C66\;font-weight:bold;line-height:1.6;}";
     print "//-->";
     print "</style>";
-    print "</head><body>";
+    print "<title>error</title></head><body>";
     print $_[0];
     print "</body></html>";
     CORE::die(@_);
@@ -43,6 +43,22 @@ my %images_gif = (
   "new"    => "data:image/gif;base64,R0lGODlhFgAMAPkAMQAAAP8A/wAAAAAAACH/C05FVFNDQVBFMi4wAwEAAAAh+QQJBQAAACwAAAIAFgAKAAACJ4SPqRDtD2MTtNp7Z6j7if6F2iZa4HmKU4mGH8iVlBZ7kIrlucTzBQAh+QQJCgAAACwAAAEAFgAKAAACJ4SPqRDtD2MTtNp7Z6j7if6F2iZa4HmKU4mGH8iVlBZ7kIrlucTzBQAh+QQJCgAAACwAAAEAFgAKAAACJ4yPqSbtDyELjiJhsZ50vwyCG+OFGpZVXjOpVzJGsrzUNYDn+s4DBQAh+QQFCgAAACwAAAIAFgAJAAACIoyPqSbtDyELjiJhsZ50vwyCG+OFGpZVXjOpVzJGsrzUdYEAOw==",
   "folder" => "data:image/gif;base64,R0lGODlhEwATAOYAAI1tD+TDUVpkzMmjKBoZa83F7woISnt4k+HLlLCt0rycQcWnUM7V/2dw///4sf/qlGZmZv/3Vquo/9K1PJOOsZ6DMK+jlf/Za////zMzZp2MckM/epSh/+Ths//YYNWxc+/erJh7J9SoL9u6Q///vrutvOW4YP//mXaB5ywlOZ+Inf//zL6VJMiiOoyY///JTvC/Qv//fJmZzKp+C+rv////ZtGyaignhqyy///taeTFfnZ1xTs2S0tQiublztO3QdrS5v/84//zgf/JXMmrStqtMP/jYN7g/xAPXcqxsv//jHx8oe3GYua6VKmSm7+bL///9//mbf26P///cpl7J96+dra43ZmZ/9SsNv//Xv7aWNCrNtK0YrW+/9u3OuC8S9i1TcyjJ//LXP//tD8+gv//h52c0wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH5BAUUABgALAAAAAATABMAAAexgBiCg4SFhoeIiYqLjI2LRwRLjoJHZEhmiSCaUIIMGxk3MocIHx9cOkEYVikUOwajgw5MURo8Cz49h1BTEVljHVUQBzMPNIc5W2BfFgIoDQdECk2chRctGEBXVwkSBUIrTxWGYj8kSV2COCUvJAEAhkMTSiYSHC5XNlJlXlTjE2M1Pqhw8iGGFiUjQhjyUC5HDiNGcpyAcSKhIRYDJogQUaRjkTBYwvQzFKKkyZMKDQUCADs=",
 );
+
+
+my $html_prefix = "";
+$html_prefix = <<"__EOF__";
+<html lang="ja"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex,nofollow">
+  <link rel="stylesheet" href="/bootstrap-3.3.5-dist/css/bootstrap.min.css">
+  <script type="text/javascript" src="/bootstrap-3.3.5-dist/js/bootstrap.min.js" async defer></script>
+  <style type="text/css">
+    .form-horizontal{width:100%;max-width:480px;margin:0 auto;}
+    .form-horizontal .form-group{width:80%;max-width:80%;margin:20px auto;}
+  </style>
+__EOF__
 
 
 my %cookies = (
@@ -119,28 +135,17 @@ if ($login_user && $login_info{$login_user}) {
     opendir(DIR, $directory) || die "E2001：$form{'cd'}";
     my @reading_list = sort grep(!/^\./, readdir(DIR));
     closedir(DIR);
-    print "content-type: text/html; charset=UTF-8\n\n";
-    print "<html><head>";
-    print "<meta http-equiv=\"content-type\" content=\"text/html; charset=UTF-8\">";
-    print "<meta name=\"robots\" content=\"noindex,nofollow\">";
-    print "<meta name=\"robots\" content=\"noarchive\">";
-    print "<style type=\"text/css\">";
-    print "<!--\n";
-    print "*{font-size:10pt\;color:#333\;}";
-    print "fieldset{padding:10px\;}";
-    print "legend{font-weight:bold\;}";
-    print "hr{height:1px\;}";
-    print "img{border:0px\;margin:0px\;}";
-    print "//-->";
-    print "</style>";
-    print "<title>一覧</title></head><body>";
-    print "<fieldset><legend>メニュー</legend>";
-    print "<img src=\"$images_gif{'back'}\" height=\"19\" width=\"19\">";
-    print "<a href=\"javascript:history.back();\">戻る</a>";
-    print "&emsp;";
-    print "<img src=\"$images_gif{'home'}\" height=\"19\" width=\"19\">";
-    print "<a href=\"$server_script\">ホーム</a>";
-    print "<hr>";
+		print "content-type: text/html; charset=UTF-8\n\n";
+    print $html_prefix;
+    print qq|<title>一覧</title></head><body>|;
+    print qq|<fieldset>|;
+    print qq|  <legend>メニュー</legend>|;
+    print qq|  <img src="$images_gif{'back'}" height="19" width="19">|;
+    print qq|  <a href="javascript:history.back();">戻る</a>|;
+    print qq|  <font>&emsp;</font>|;
+    print qq|  <img src="$images_gif{'home'}" height="19" width="19">|;
+    print qq|  <a href="$server_script">ホーム</a>|;
+    print qq|  <hr>|;
     my $para_directory = "";
     foreach my $strdir (split(/\//, $form{'cd'})) {
       $strdir =~ s/([^\w ])/'%'.unpack('H2',$1)/eg;
@@ -148,51 +153,41 @@ if ($login_user && $login_info{$login_user}) {
     }
     foreach my $file_name (@reading_list) {
       my $path_file = "$directory/$file_name";
-      my $para_file = $file_name;
+      my $para_file = "$file_name";
       $para_file =~s/([^\w ])/'%'.unpack('H2',$1)/eg;
       if (-f $path_file) {
-        my $files = `find "$root_directory" -name "$file_name" -type f -mtime -1`;
-        if ($files) { 
-          print "・ ";
-          print "<img src=\"$images_gif{'file'}\" height=\"19\" width=\"19\">";
-          print "<a target=\"_blank\" href=\"$server_script&cm=cd&cf=$para_directory$para_file\">$file_name</a>";
-          print "&nbsp;<img src=\"$images_gif{'new'}\" height=\"12\" width=\"22\"><br>";
-        } else {
-          print "・ ";
-          print "<img src=\"$images_gif{'file'}\" height=\"19\" width=\"19\">";
-          print "<a target=\"_blank\" href=\"$server_script&cm=cd&cf=$para_directory$para_file\">$file_name</a>";
-          print "<br>";
-        }
+        print qq|<font>・ </font>|;
+        print qq|<img src="$images_gif{'file'}" height="19" width="19">|;
+        print qq|<a target="_blank" href="$server_script&cm=cd&cf=$para_directory$para_file">$file_name</a>|;
+        print qq|<font>&nbsp;</font><img src="$images_gif{'new'}" height="12" width="22">|
+					if (`find "$root_directory" -name "$file_name" -type f -mtime -1`);
+        print qq|<br>|;
       } else {
-        my $files = `find "$root_directory" -name "$file_name" -type d -mtime -1`;
-        if ($files) {
-          print "・ ";
-          print "<img src=\"$images_gif{'folder'}\" height=\"19\" width=\"19\">";
-          print "<a href=\"$server_script&cd=$para_directory$para_file\">$file_name</a>";
-          print "&nbsp;<img src=\"$images_gif{'new'}\" height=\"12\" width=\"22\"><br>";
-        } else {
-          print "・ ";
-          print "<img src=\"$images_gif{'folder'}\" height=\"19\" width=\"19\">";
-          print "<a href=\"$server_script&cd=$para_directory$para_file\">$file_name</a>";
-          print "<br>";
-        }
+        print qq|<font>・ </font>|;
+        print qq|<img src="$images_gif{'folder'}" height="19" width="19">|;
+        print qq|<a href="$server_script&cd=$para_directory$para_file">$file_name</a>|;
+				print qq|<font>&nbsp;</font><img src="$images_gif{'new'}" height="12" width="22">|
+	        if (`find "$root_directory" -name "$file_name" -type d -mtime -1`);
+				print qq|<br>|;
       }
     }
-    print "</fieldset>";
-    print "<hr>＊Cookieを無効にしているとログインできませんのでご注意ください！";
-    print "</body></html>";
+    print qq|</fieldset>|;
+    print qq|<hr>＊Cookieを無効にしているとログインできませんのでご注意ください！|;
+    print qq|</body></html>|;
   } else {
     my $path_file = "$root_directory/$form{'cf'}";
     my @pathes = split(/\//, $path_file);
     my $save_file = Encode::encode("sjis", Encode::decode("utf8", pop @pathes));
+		my $html_header = "";
     if ($save_file =~ /\.apk$/i) {
-      print qq|Content-Type: application/vnd.android.package-archive; name="$save_file"\n|;
-      print qq|Content-Disposition: attachment; filename="$save_file"\n\n|;
+      $html_header.= "Content-Type: application/vnd.android.package-archive; name=\"$save_file\"\n";
+      $html_header.= "Content-Disposition: attachment; filename=\"$save_file\"\n\n";
     } else {
-      print qq|Content-type: application/octet-stream; name="$save_file"\n|;
-      print qq|Content-Disposition: attachment; filename="$save_file"\n\n|;
+      $html_header.= "Content-type: application/octet-stream; name=\"$save_file\"\n";
+      $html_header.= "Content-Disposition: attachment; filename=\"$save_file\"\n\n";
     }
     open IN,"$path_file" || die "E3001：$form{'cf'}";
+    print $html_header;
     print <IN>;
     close IN;
   }
@@ -210,51 +205,50 @@ if ($login_user && $login_info{$login_user}) {
         my $hex = Digest::SHA::hmac_sha512_hex($salt.$current_user, $hkey);
         print "Set-Cookie: cu=$hex; path=/;\n";
         print "content-type: text/html; charset=UTF-8\n\n";
-        print "<html><head>";
-        print "<meta http-equiv=\"content-type\" content=\"text/html; charset=UTF-8\">";
-        print "<meta http-equiv=\"refresh\" content=\"0; URL=$server_script?ut=$salt\">";
-        print "<style type=\"text/css\">";
-        print "<!--\n";
-        print "*{font-size:10pt\;color:#333\;}";
-        print "//-->";
-        print "</style>";
-        print "</head><body>";
-        print "<div><a href=\"$server_script?ut=$salt\">$server_script</a></div>";
-        print "<div>&nbsp;</div>";
-        print "<div>＊自動的に切り替わります。（画面が切り替わらない場合はクリックして移動してください。）</div>";
-        print "</body></html>";
+    		print $html_prefix;
+        print qq|<meta http-equiv="refresh" content="0; URL=$server_script?ut=$salt">|;
+    		print qq|<title>ダウンロード</title>|;
+    		print qq|</head>|;
+    		print qq|<body>|;
+    		print qq|  <div><a href="$server_script?ut=$salt">$server_script</a></div>|;
+    		print qq|  <div>&nbsp;</div>|;
+    		print qq|  <div>＊自動的に切り替わります。（画面が切り替わらない場合はクリックして移動してください。）</div>|;
+    		print qq|</body>|;
+    		print qq|</html>|;
         exit;
       }
     }
     print "Location: $server_script\n\n";
-  } else {
-    print "content-type: text/html; charset=UTF-8\n\n";
-    print "<html><head>";
-    print "<meta http-equiv=\"content-type\" content=\"text/html; charset=UTF-8\">";
-    print "<style type=\"text/css\">";
-    print "<!--\n";
-    print "*{font-size:10pt\;color:#333\;}";
-    print "fieldset{padding:10px\;}";
-    print "legend{font-weight:bold\;}";
-    print "hr{height:1px\;}";
-    print "img{border:0px\;margin:0px\;}";
-    print "span{display:inline-block;width:80px;height:24px;}";
-    print "//-->";
-    print "</style>";
-    print "</head><body>";
-    print "<fieldset><legend>ログイン</legend>";
-    print "<form method=\"POST\">";
-    print "<ul>";
-    print "<li><span>ユーザーID</span><input name=\"cu\" value=\"".$form{'cu'}."\" type=\"text\" placeholder=\"...半角英数\" pattern=\"^[0-9A-Za-z]+\$\" required autofocus></li>";
-    print "<li><span>パスワード</span><input name=\"cp\" value=\"".$form{'cp'}."\" type=\"password\" placeholder=\"...\" required></li>";
-    print "</ul>";
-    print "<hr>";
-    print "<div><input type=\"submit\" value=\"ログイン\"></div>";
-    print "</form>";
-    print "</fieldset>";
-    print "<hr>＊Cookieを無効にしているとログインできませんのでご注意ください！";
-    print "</body></html>";
-  }
+    exit;
+	}
+  print "content-type: text/html; charset=UTF-8\n\n";
+  print $html_prefix;
+  print qq|<title>ログイン</title>|;
+  print qq|</head>|;
+  print qq|<body>|;
+  print qq|  <div class="form-horizontal">|;
+  print qq|    <h1><small>ログイン</small></h1>|;
+  print qq|    <hr>|;
+  print qq|    <form method="POST">|;
+  print qq|      <div class="form-group">|;
+  print qq|        <label for="cu" class="control-label">ユーザーID</label>|;
+  print qq|        <input id="cu" name="cu" value="$form{'cu'}" type="text" placeholder="...半角英数" pattern="^[0-9A-Za-z]+\$" required autofocus class="form-control">|;
+  print qq|      </div>|;
+  print qq|      <div class="form-group">|;
+  print qq|        <label for="cp" class="control-label">パスワード</label>|;
+  print qq|        <input id="cp" name="cp" value="$form{'cp'}" type="password" placeholder="..." required class="form-control">|;
+  print qq|      </div>|;
+  print qq|      <div class="form-group">|;
+  print qq|        <div class="pull-right">|;
+  print qq|          <input type="submit" value="ログイン" class="btn btn-primary btn-lg">|;
+  print qq|        </div>|;
+  print qq|      </div>|;
+  print qq|    </form>|;
+  print qq|    <hr>|;
+  print qq|    <p>＊Cookieを無効にしているとログインできませんのでご注意ください！</p>|;
+  print qq|  </div>|;
+  print qq|</body>|;
+  print qq|</html>|;
 }
 
 
