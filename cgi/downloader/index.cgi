@@ -137,7 +137,7 @@ if ($login_user && $login_info{$login_user}) {
     opendir(DIR, $directory) || die "E2001：$form{'cd'}";
     my @reading_list = sort grep(!/^\./, readdir(DIR));
     closedir(DIR);
-		print "content-type: text/html; charset=UTF-8\n\n";
+    print "content-type: text/html; charset=UTF-8\n\n";
     print $html_prefix;
     print qq|<title>一覧</title>|;
     print qq|</head>|;
@@ -168,16 +168,16 @@ if ($login_user && $login_info{$login_user}) {
         print qq|  <a target="_blank" href="$server_script&cm=cd&cf=$para_directory$para_file">$file_name</a>|;
         print qq|  <span>&nbsp;</span>|;
         print qq|  <img src="$images_gif{'new'}" height="12" width="22">|
-					if (`find "$root_directory" -name "$file_name" -type f -mtime -1`);
+          if (`find "$root_directory" -name "$file_name" -type f -mtime -1`);
         print qq|</div>|;
       } else {
         print qq|<div class="list-group">|;
         print qq|  <img src="$images_gif{'folder'}" height="19" width="19">|;
         print qq|  <a href="$server_script&cd=$para_directory$para_file">$file_name</a>|;
-				print qq|  <span>&nbsp;</span>|;
-				print qq|  <img src="$images_gif{'new'}" height="12" width="22">|
-	        if (`find "$root_directory" -name "$file_name" -type d -mtime -1`);
-				print qq|</div>|;
+        print qq|  <span>&nbsp;</span>|;
+        print qq|  <img src="$images_gif{'new'}" height="12" width="22">|
+          if (`find "$root_directory" -name "$file_name" -type d -mtime -1`);
+        print qq|</div>|;
       }
     }
     print qq|    <hr>|;
@@ -189,7 +189,7 @@ if ($login_user && $login_info{$login_user}) {
     my $path_file = "$root_directory/$form{'cf'}";
     my @pathes = split(/\//, $path_file);
     my $save_file = Encode::encode("sjis", Encode::decode("utf8", pop @pathes));
-		my $html_header = "";
+    my $html_header = "";
     if ($save_file =~ /\.apk$/i) {
       $html_header.= "Content-Type: application/vnd.android.package-archive; name=\"$save_file\"\n";
       $html_header.= "Content-Disposition: attachment; filename=\"$save_file\"\n\n";
@@ -216,22 +216,22 @@ if ($login_user && $login_info{$login_user}) {
         my $hex = Digest::SHA::hmac_sha512_hex($salt.$current_user, $hkey);
         print "Set-Cookie: cu=$hex; path=/;\n";
         print "content-type: text/html; charset=UTF-8\n\n";
-    		print $html_prefix;
+        print $html_prefix;
         print qq|<meta http-equiv="refresh" content="0; URL=$server_script?ut=$salt">|;
-    		print qq|<title>ダウンロード</title>|;
-    		print qq|</head>|;
-    		print qq|<body>|;
-    		print qq|  <div><a href="$server_script?ut=$salt">$server_script</a></div>|;
-    		print qq|  <div>&nbsp;</div>|;
-    		print qq|  <div>＊自動的に切り替わります。（画面が切り替わらない場合はクリックして移動してください。）</div>|;
-    		print qq|</body>|;
-    		print qq|</html>|;
+        print qq|<title>ダウンロード</title>|;
+        print qq|</head>|;
+        print qq|<body>|;
+        print qq|  <div><a href="$server_script?ut=$salt">$server_script</a></div>|;
+        print qq|  <div>&nbsp;</div>|;
+        print qq|  <div>＊自動的に切り替わります。（画面が切り替わらない場合はクリックして移動してください。）</div>|;
+        print qq|</body>|;
+        print qq|</html>|;
         exit;
       }
     }
     print "Location: $server_script\n\n";
     exit;
-	}
+  }
   print "content-type: text/html; charset=UTF-8\n\n";
   print $html_prefix;
   print qq|<title>ログイン</title>|;
