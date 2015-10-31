@@ -22,7 +22,7 @@ BEGIN {
 
 
 use Encode qw/decode encode/;
-use Digest::SHA qw/sha512_hex/;
+use Digest::SHA qw/sha1_hex hmac_sha512_hex/;
 
 
 my $server_script = "http://".$ENV{'SERVER_NAME'}.$ENV{'SCRIPT_NAME'};
@@ -57,6 +57,8 @@ $html_prefix = <<"__EOF__";
   <style type="text/css">
     .form-horizontal{width:100%;max-width:480px;margin:0 auto;}
     .form-horizontal .form-group{width:80%;max-width:80%;margin:20px auto;}
+    .form-horizontal .list-group{width:90%;max-width:90%;margin:20px auto;}
+    .form-horizontal .list-group img{vertical-align:baseline;}
   </style>
 __EOF__
 
@@ -137,15 +139,20 @@ if ($login_user && $login_info{$login_user}) {
     closedir(DIR);
 		print "content-type: text/html; charset=UTF-8\n\n";
     print $html_prefix;
-    print qq|<title>一覧</title></head><body>|;
-    print qq|<fieldset>|;
-    print qq|  <legend>メニュー</legend>|;
-    print qq|  <img src="$images_gif{'back'}" height="19" width="19">|;
-    print qq|  <a href="javascript:history.back();">戻る</a>|;
-    print qq|  <font>&emsp;</font>|;
-    print qq|  <img src="$images_gif{'home'}" height="19" width="19">|;
-    print qq|  <a href="$server_script">ホーム</a>|;
-    print qq|  <hr>|;
+    print qq|<title>一覧</title>|;
+    print qq|</head>|;
+    print qq|<body>|;
+    print qq|  <div class="form-horizontal">|;
+    print qq|    <h1><small>メニュー</small></h1>|;
+    print qq|    <hr>|;
+    print qq|    <div class="list-group">|;
+    print qq|      <img src="$images_gif{'back'}" height="19" width="19">|;
+    print qq|      <a href="javascript:history.back();">戻る</a>|;
+    print qq|      <span>&emsp;</span>|;
+    print qq|      <img src="$images_gif{'home'}" height="19" width="19">|;
+    print qq|      <a href="$server_script">ホーム</a>|;
+    print qq|    </div>|;
+    print qq|    <hr>|;
     my $para_directory = "";
     foreach my $strdir (split(/\//, $form{'cd'})) {
       $strdir =~ s/([^\w ])/'%'.unpack('H2',$1)/eg;
@@ -156,24 +163,28 @@ if ($login_user && $login_info{$login_user}) {
       my $para_file = "$file_name";
       $para_file =~s/([^\w ])/'%'.unpack('H2',$1)/eg;
       if (-f $path_file) {
-        print qq|<font>・ </font>|;
-        print qq|<img src="$images_gif{'file'}" height="19" width="19">|;
-        print qq|<a target="_blank" href="$server_script&cm=cd&cf=$para_directory$para_file">$file_name</a>|;
-        print qq|<font>&nbsp;</font><img src="$images_gif{'new'}" height="12" width="22">|
+        print qq|<div class="list-group">|;
+        print qq|  <img src="$images_gif{'file'}" height="19" width="19">|;
+        print qq|  <a target="_blank" href="$server_script&cm=cd&cf=$para_directory$para_file">$file_name</a>|;
+        print qq|  <span>&nbsp;</span>|;
+        print qq|  <img src="$images_gif{'new'}" height="12" width="22">|
 					if (`find "$root_directory" -name "$file_name" -type f -mtime -1`);
-        print qq|<br>|;
+        print qq|</div>|;
       } else {
-        print qq|<font>・ </font>|;
-        print qq|<img src="$images_gif{'folder'}" height="19" width="19">|;
-        print qq|<a href="$server_script&cd=$para_directory$para_file">$file_name</a>|;
-				print qq|<font>&nbsp;</font><img src="$images_gif{'new'}" height="12" width="22">|
+        print qq|<div class="list-group">|;
+        print qq|  <img src="$images_gif{'folder'}" height="19" width="19">|;
+        print qq|  <a href="$server_script&cd=$para_directory$para_file">$file_name</a>|;
+				print qq|  <span>&nbsp;</span>|;
+				print qq|  <img src="$images_gif{'new'}" height="12" width="22">|
 	        if (`find "$root_directory" -name "$file_name" -type d -mtime -1`);
-				print qq|<br>|;
+				print qq|</div>|;
       }
     }
-    print qq|</fieldset>|;
-    print qq|<hr>＊Cookieを無効にしているとログインできませんのでご注意ください！|;
-    print qq|</body></html>|;
+    print qq|    <hr>|;
+    print qq|    <p>＊Cookieを無効にしているとログインできませんのでご注意ください！</p>|;
+    print qq|  </div>|;
+    print qq|</body>|;
+    print qq|</html>|;
   } else {
     my $path_file = "$root_directory/$form{'cf'}";
     my @pathes = split(/\//, $path_file);
