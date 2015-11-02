@@ -165,7 +165,7 @@ if ($login_user && $login_info{$login_user}) {
       if (-f $path_file) {
         print qq|<div class="list-group">|;
         print qq|  <img src="$images_gif{'file'}" height="19" width="19">|;
-        print qq|  <a target="_blank" href="$server_script&cm=cd&cf=$para_directory$para_file">$file_name</a>|;
+        print qq|  <a target="displaynone" href="$server_script&cm=cd&cf=$para_directory$para_file">$file_name</a>|;
         print qq|  <span>&nbsp;</span>|;
         print qq|  <img src="$images_gif{'new'}" height="12" width="22">|
           if (`find "$root_directory" -name "$file_name" -type f -mtime -1`);
@@ -183,18 +183,21 @@ if ($login_user && $login_info{$login_user}) {
     print qq|    <hr>|;
     print qq|    <p>＊Cookieを無効にしているとログインできませんのでご注意ください！</p>|;
     print qq|  </div>|;
+    print qq|  <iframe name="displaynone" id="displaynone" class="hidden" width="0" height="0"></iframe>|;
     print qq|</body>|;
     print qq|</html>|;
   } else {
     my $path_file = "$root_directory/$form{'cf'}";
     my @pathes = split(/\//, $path_file);
-    my $save_file = Encode::encode("sjis", Encode::decode("utf8", pop @pathes));
+    my $save_file = pop @pathes;
+    $save_file = Encode::encode("sjis", Encode::decode("utf8", $save_file))
+      if ($ENV{'HTTP_USER_AGENT'} =~ /MSIE|Trident/i);
     my $html_header = "";
     if ($save_file =~ /\.apk$/i) {
-      $html_header.= "Content-Type: application/vnd.android.package-archive; name=\"$save_file\"\n";
+      $html_header.= "Content-Type: application/vnd.android.package-archive;\n";
       $html_header.= "Content-Disposition: attachment; filename=\"$save_file\"\n\n";
     } else {
-      $html_header.= "Content-type: application/octet-stream; name=\"$save_file\"\n";
+      $html_header.= "Content-type: application/octet-stream;\n";
       $html_header.= "Content-Disposition: attachment; filename=\"$save_file\"\n\n";
     }
     open IN,"$path_file" || die "E3001：$form{'cf'}";
