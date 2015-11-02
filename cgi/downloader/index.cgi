@@ -194,10 +194,10 @@ if ($login_user && $login_info{$login_user}) {
       if ($ENV{'HTTP_USER_AGENT'} =~ /MSIE|Trident/i);
     my $html_header = "";
     if ($save_file =~ /\.apk$/i) {
-      $html_header.= "Content-Type: application/vnd.android.package-archive;\n";
+      $html_header.= "Content-Type: application/vnd.android.package-archive\n";
       $html_header.= "Content-Disposition: attachment; filename=\"$save_file\"\n\n";
     } else {
-      $html_header.= "Content-type: application/octet-stream;\n";
+      $html_header.= "Content-type: application/octet-stream\n";
       $html_header.= "Content-Disposition: attachment; filename=\"$save_file\"\n\n";
     }
     open IN,"$path_file" || die "E3001：$form{'cf'}";
