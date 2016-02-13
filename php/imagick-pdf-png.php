@@ -12,7 +12,7 @@ function imagickNgFromPdfToPng($inputPdfFullName, $outputPngRootPath) {
         $image->setIteratorIndex($i);
         $image->adaptiveResizeImage(1280, 800, true);
         $image->stripImage();
-        $image->writeImage(sprintf("%s%s%d.png", $outputPngRootPath, DS, $i);
+        $image->writeImage(sprintf("%s%s%d.png", $outputPngRootPath, DS, $i));
     }
     $image->clear();
     $image->destroy();
@@ -38,7 +38,7 @@ function imagickOkFromPdfToPng($inputPdfFullName, $outputPngRootPath) {
         $output->setImageFormat("png");
         $output->stripImage();
         $output->compositeImage($input, Imagick::COMPOSITE_DEFAULT, 0, 0);
-        $output->writeImage(sprintf("%s%s%d.png", $outputPngRootPath, DS, $i);
+        $output->writeImage(sprintf("%s%s%d.png", $outputPngRootPath, DS, $i));
         $output->clear();
         $output->destroy();
         $output = null;
