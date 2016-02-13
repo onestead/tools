@@ -6,7 +6,7 @@ function imagickNgFromPdfToPng($inputPdfFullName, $outputPngRootPath) {
     $image->setImageFormat("png");
     $image->setImageColorspace(\Imagick::COLORSPACE_SRGB);
     $image->setBackgroundColor(new ImagickPixel('white'));
-    $image->setImageAlphaChannel(1);
+    $image->setImageAlphaChannel(imagick::ALPHACHANNEL_DEACTIVATE);
     $count = $image->getImageScene();
     for ($i = 0; $i <= $count; $i++) {
         $image->setIteratorIndex($i);
