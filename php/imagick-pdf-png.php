@@ -3,6 +3,8 @@ function imagickNgFromPdfToPng($inputPdfFullName, $outputPngRootPath) {
     $image->setResourceLimit(imagick::RESOURCETYPE_FILE, 32);
     $image->setResolution(144, 144);
     $image->readImage($inputPdfFullName);
+    $image->setImageCompression(imagick::COMPRESSION_UNDEFINED);
+    $image->setImageCompressionQuality(0);
     $image->setImageFormat("png");
     $image->setImageColorspace(imagick::COLORSPACE_SRGB);
     $image->setBackgroundColor(new ImagickPixel('white'));
@@ -35,6 +37,8 @@ function imagickOkFromPdfToPng($inputPdfFullName, $outputPngRootPath) {
         $output->setResolution(144, 144);
         $output->newImage($size['width'], $size['height'], new ImagickPixel('white'));
         $output->setImageColorspace(imagick::COLORSPACE_SRGB);
+        $output->setImageCompression(imagick::COMPRESSION_UNDEFINED);
+        $output->setImageCompressionQuality(0);
         $output->setImageFormat("png");
         $output->stripImage();
         $output->compositeImage($input, imagick::COMPOSITE_DEFAULT, 0, 0);
