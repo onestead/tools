@@ -4,7 +4,7 @@ function imagickNgFromPdfToPng($inputPdfFullName, $outputPngRootPath) {
     $image->setResolution(144, 144);
     $image->readImage($inputPdfFullName);
     $image->setImageFormat("png");
-    $image->setImageColorspace(\Imagick::COLORSPACE_SRGB);
+    $image->setImageColorspace(imagick::COLORSPACE_SRGB);
     $image->setBackgroundColor(new ImagickPixel('white'));
     $image->setImageAlphaChannel(imagick::ALPHACHANNEL_DEACTIVATE);
     $count = $image->getImageScene();
@@ -24,7 +24,7 @@ function imagickOkFromPdfToPng($inputPdfFullName, $outputPngRootPath) {
     $input->setResourceLimit(imagick::RESOURCETYPE_FILE, 32);
     $input->setResolution(144, 144);
     $input->readImage($inputPdfFullName);
-    $input->setImageColorspace(\Imagick::COLORSPACE_SRGB);
+    $input->setImageColorspace(imagick::COLORSPACE_SRGB);
     $count = $input->getImageScene();
     for ($i = 0; $i <= $count; $i++) {
         $input->setIteratorIndex($i);
@@ -34,7 +34,7 @@ function imagickOkFromPdfToPng($inputPdfFullName, $outputPngRootPath) {
         $output->setResourceLimit(imagick::RESOURCETYPE_FILE, 32);
         $output->setResolution(144, 144);
         $output->newImage($size['width'], $size['height'], new ImagickPixel('white'));
-        $output->setImageColorspace(\Imagick::COLORSPACE_SRGB);
+        $output->setImageColorspace(imagick::COLORSPACE_SRGB);
         $output->setImageFormat("png");
         $output->stripImage();
         $output->compositeImage($input, Imagick::COMPOSITE_DEFAULT, 0, 0);
