@@ -1,12 +1,12 @@
 function imagickNgFromPdfToPng($inputPdfFullName, $outputPngRootPath) {
     $image = new Imagick();
-    $image->setResourceLimit(imagick::RESOURCETYPE_FILE, 32);
+    $image->setResourceLimit(Imagick::RESOURCETYPE_FILE, 32);
     $image->setResolution(144, 144);
     $image->readImage($inputPdfFullName);
     $image->setImageFormat("png");
-    $image->setImageColorspace(imagick::COLORSPACE_SRGB);
+    $image->setImageColorspace(Imagick::COLORSPACE_SRGB);
     $image->setBackgroundColor(new ImagickPixel('white'));
-    $image->setImageAlphaChannel(imagick::ALPHACHANNEL_DEACTIVATE);
+    $image->setImageAlphaChannel(Imagick::ALPHACHANNEL_DEACTIVATE);
     $count = $image->getImageScene();
     for ($i = 0; $i <= $count; $i++) {
         $image->setIteratorIndex($i);
@@ -21,20 +21,20 @@ function imagickNgFromPdfToPng($inputPdfFullName, $outputPngRootPath) {
 
 function imagickOkFromPdfToPng($inputPdfFullName, $outputPngRootPath) {
     $input = new Imagick();
-    $input->setResourceLimit(imagick::RESOURCETYPE_FILE, 32);
+    $input->setResourceLimit(Imagick::RESOURCETYPE_FILE, 32);
     $input->setResolution(144, 144);
     $input->readImage($inputPdfFullName);
-    $input->setImageColorspace(imagick::COLORSPACE_SRGB);
+    $input->setImageColorspace(Imagick::COLORSPACE_SRGB);
     $count = $input->getImageScene();
     for ($i = 0; $i <= $count; $i++) {
         $input->setIteratorIndex($i);
         $input->adaptiveResizeImage(1280, 800, true);
         $size = $input->getImageGeometry();
         $output = new Imagick();
-        $output->setResourceLimit(imagick::RESOURCETYPE_FILE, 32);
+        $output->setResourceLimit(Imagick::RESOURCETYPE_FILE, 32);
         $output->setResolution(144, 144);
         $output->newImage($size['width'], $size['height'], new ImagickPixel('white'));
-        $output->setImageColorspace(imagick::COLORSPACE_SRGB);
+        $output->setImageColorspace(Imagick::COLORSPACE_SRGB);
         $output->setImageFormat("png");
         $output->stripImage();
         $output->compositeImage($input, Imagick::COMPOSITE_DEFAULT, 0, 0);
