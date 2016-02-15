@@ -3,17 +3,17 @@ function imagickNgFromPdfToPng($inputPdfFullName, $outputPngRootPath) {
     $image->setResourceLimit(imagick::RESOURCETYPE_FILE, 32);
     $image->setResolution(144, 144);
     $image->readImage($inputPdfFullName);
+    $image->setImageColorspace(imagick::COLORSPACE_SRGB);
+    $image->setImageFormat("png");
     $image->setImageCompression(imagick::COMPRESSION_UNDEFINED);
     $image->setImageCompressionQuality(0);
-    $image->setImageFormat("png");
-    $image->setImageColorspace(imagick::COLORSPACE_SRGB);
     $image->setBackgroundColor(new ImagickPixel('white'));
     $image->setImageAlphaChannel(imagick::ALPHACHANNEL_DEACTIVATE);
     $count = $image->getImageScene();
     for ($i = 0; $i <= $count; $i++) {
         $image->setIteratorIndex($i);
-        $image->adaptiveResizeImage(1280, 800, true);
         $image->stripImage();
+        $image->adaptiveResizeImage(1280, 800, true);
         $image->writeImage(sprintf("%s%s%d.png", $outputPngRootPath, DS, $i));
     }
     $image->clear();
@@ -30,6 +30,7 @@ function imagickOkFromPdfToPng($inputPdfFullName, $outputPngRootPath) {
     $count = $input->getImageScene();
     for ($i = 0; $i <= $count; $i++) {
         $input->setIteratorIndex($i);
+        $input->stripImage();
         $input->adaptiveResizeImage(1280, 800, true);
         $size = $input->getImageGeometry();
         $output = new Imagick();
@@ -37,11 +38,10 @@ function imagickOkFromPdfToPng($inputPdfFullName, $outputPngRootPath) {
         $output->setResolution(144, 144);
         $output->newImage($size['width'], $size['height'], new ImagickPixel('white'));
         $output->setImageColorspace(imagick::COLORSPACE_SRGB);
+        $output->setImageFormat("png");
         $output->setImageCompression(imagick::COMPRESSION_UNDEFINED);
         $output->setImageCompressionQuality(0);
-        $output->setImageFormat("png");
-        $output->stripImage();
-        $output->compositeImage($input, imagick::COMPOSITE_DEFAULT, 0, 0);
+        $output->compositeImage($input, imagick::COMPOSITE_DEFAULT, 0, 0, imagick::CHANNEL_ALL);
         $output->writeImage(sprintf("%s%s%d.png", $outputPngRootPath, DS, $i));
         $output->clear();
         $output->destroy();
