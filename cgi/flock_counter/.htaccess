@@ -1,0 +1,4 @@
+<Files ~ "^(count.dat|count.loc)$">
+	order allow,deny
+	deny from all
+</Files>
