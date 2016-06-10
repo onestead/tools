@@ -15,9 +15,9 @@ if (open(LOCK, "> $lockFile") && flock(LOCK, 2)) {
 			print OUT $resultId+1;
 			close(OUT);
 			rename($tempFile, $dataFile);
-		}
-	}
+		} else { $resultId = -3; }
+	} else { $resultId = -2; }
 	close(LOCK);
-}
+} else { $resultId = -1; }
 print "Content-Type: text/html\n\n";
 print qq|<html><head><title></title></head><body>$resultId</body></html>|;
