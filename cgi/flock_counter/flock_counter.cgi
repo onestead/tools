@@ -8,7 +8,7 @@ my $tempFile = "count.$$";
 my $resultId = 0;
 
 if (open(LOCK, "> $lockFile") && flock(LOCK, 2)) {
-	if (open(IN, $dataFile) && flock(IN, 2)) {
+	if (open(IN, $dataFile) && flock(IN, 1)) {
 		$resultId = <IN>;
 		close(IN);
 		if (open(OUT, "> $tempFile") && flock(OUT, 2)) {
